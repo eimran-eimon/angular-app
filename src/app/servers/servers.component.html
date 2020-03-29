@@ -17,6 +17,6 @@
   Add Servers
 </button>
 <hr>
-<p class="alert-info">{{ serverCreationStatus }}</p>
+<p *ngIf="isServerCreated" class="alert-success">{{ serverCreationStatus }}</p>
 <app-server></app-server>
 <app-server></app-server>
