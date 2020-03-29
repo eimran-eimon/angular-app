@@ -5,6 +5,11 @@
   <title>Title</title>
 </head>
 <body>
-<h4>Server with ServerId: {{ serverId }} and status: {{ getServerStatus() }}</h4>
+<h4
+  [ngStyle]={backgroundColor:getColor()}
+  [ngClass]="{'online': serverStatus === 'online' }"
+>
+  Server with ServerId: {{ serverId }} and status: {{ getServerStatus() }}
+</h4>
 </body>
 </html>

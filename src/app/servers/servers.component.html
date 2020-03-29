@@ -17,6 +17,8 @@
   Add Servers
 </button>
 <hr>
-<p *ngIf="isServerCreated" class="alert-success">{{ serverCreationStatus }}</p>
-<app-server></app-server>
-<app-server></app-server>
+<p *ngIf="isServerCreated; else noServer" class="alert-success">{{ serverCreationStatus }}</p>
+<ng-template #noServer>
+  <p class="alert-danger">No server is created.</p>
+</ng-template>
+<app-server *ngFor="let server of servers"></app-server>
