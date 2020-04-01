@@ -6,10 +6,7 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'angular-app';
-  feature = 'recipe';
-
-  navigate(featureName: string) {
-    this.feature = featureName;
+  suggestUserName() {
+    const suggestedName = 'Superuser';
   }
 }
