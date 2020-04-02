@@ -1,77 +1,63 @@
 <div class="container">
   <div class="row">
     <div class="col-xs-12 col-sm-10 col-md-8 col-sm-offset-1 col-md-offset-2">
-      <form #f="ngForm" (ngSubmit)="onSubmit()">
-        <div #userData="ngModelGroup" id="user-data" ngModelGroup="userData">
+      <form (ngSubmit)="onSubmit()" [formGroup]="signUpForm">
+        <div formGroupName="userData">
           <div class="form-group">
             <label for="username">Username</label>
             <input
               class="form-control"
+              formControlName="username"
               id="username"
-              name="username"
-              ngModel
-              required
               type="text">
-          </div>
-          <button
-            (click)="suggestUserName()"
-            class="btn btn-default"
-            type="button">Suggest an Username
-          </button>
-          <div class="form-group">
-            <label for="email">Mail</label>
-            <input
-              #email="ngModel"
-              class="form-control"
-              email
-              id="email"
-              name="email"
-              ngModel
-              required
-              type="email">
             <span
-              *ngIf="!email.valid && email.touched"
-              class="help-block">Please, enter a valid email.</span>
+              *ngIf="!signUpForm.get('userData.username').valid && signUpForm.get('userData.username').touched"
+              class="help-block">
+              <span *ngIf="signUpForm.get('userData.username').errors['forBiddenName']"
+                    class="help-block">Username Forbidden!</span>
+              <span *ngIf="signUpForm.get('userData.username').errors['required']"
+                    class="help-block">This field is required!</span>
+            </span>
           </div>
+          <div class="form-group">
+            <label for="email">email</label>
+            <input
+              class="form-control"
+              formControlName="email"
+              id="email"
+              type="text">
+            <span
+              *ngIf="!signUpForm.get('userData.email').valid && signUpForm.get('userData.email').touched"
+              class="help-block">
+            Enter a valid email!</span>
+          </div>
+        </div>
 
-        </div>
-        <span *ngIf="!userData.valid && userData.touched" class="help-block">Not Valid (Group)</span>
-        <div class="form-group">
-          <label for="secret">Secret Questions</label>
-          <select
-            [ngModel]="defaultQuestion"
-            class="form-control"
-            id="secret"
-            name="secret">
-            <option value="pet">Your first Pet?</option>
-            <option value="teacher">Your first teacher?</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <textarea [(ngModel)]="reply"
-                    class="form-control"
-                    name="answer"
-                    rows="3">
-          </textarea>
-        </div>
-        <p>{{ reply }}</p>
         <div *ngFor="let gender of genders" class="radio">
           <label>
             <input
               [value]="gender"
-              name="gender"
-              ngModel
-              required
-              type="radio">
-            {{ gender }}
+              formControlName="gender"
+              type="radio">{{ gender }}
           </label>
         </div>
-        <button
-          [disabled]="!f.valid"
-          class="btn btn-primary"
-          type="submit"
-        >Submit
-        </button>
+        <div formArrayName="hobbies">
+          <button
+            (click)="addHobbies()"
+            class="btn btn-primary"
+            type="button">
+            Add Hobbies
+          </button>
+          <div *ngFor="let hobbyControl of signUpForm.get('hobbies')['controls']; let i= index;"
+               class="form-group">
+            <input [formControlName]="i" type="text">
+          </div>
+        </div>
+        <span
+          *ngIf="!signUpForm.valid && signUpForm.touched"
+          class="help-block">
+            Forms invalid!</span>
+        <button class="btn btn-primary" type="submit">Submit</button>
       </form>
     </div>
   </div>
