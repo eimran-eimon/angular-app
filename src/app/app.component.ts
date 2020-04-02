@@ -1,49 +1,55 @@
-import {Component} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
+import {Post} from './post.model';
+import {PostService} from './post.service';
+import {Subscription} from 'rxjs';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent {
-  servers = [
-    {
-      instanceType: 'medium',
-      name: 'Production Server',
-      status: 'stable',
-      started: new Date(2025, 1, 11)
-    },
-    {
-      instanceType: 'large',
-      name: 'User Database',
-      status: 'stable',
-      started: new Date(2015, 11, 23)
-    },
-    {
-      instanceType: 'small',
-      name: 'Development Server',
-      status: 'offline',
-      started: new Date(2020, 4, 1)
-    },
-    {
-      instanceType: 'small',
-      name: 'Testing Environment Server',
-      status: 'stable',
-      started: new Date(15, 1, 2017)
-    }
-  ];
-  filerStatus = '';
-  appStatus = new Promise(((resolve, reject) => {
-    setTimeout(() => {
-      resolve('Okay');
-    }, 2000);
-  }));
+export class AppComponent implements OnInit, OnDestroy {
+  loadedPosts: Post[] = [];
+  isFetch = false;
+  errorMessage = '';
+  errorSub: Subscription;
 
-  getStatusClasses(server: { instanceType: string, name: string, status: string, started: Date }) {
-    return {
-      'list-group-item-success': server.status === 'stable',
-      'list-group-item-warning': server.status === 'offline',
-      'list-group-item-danger': server.status === 'critical'
-    };
+  constructor(private http: HttpClient,
+              private postService: PostService) {
   }
+
+  ngOnInit() {
+    this.errorSub = this.postService.error.subscribe((error) => {
+      this.errorMessage  = error;
+    });
+    this.isFetch = true;
+    this.postService.fetchPosts().subscribe((response) => {
+      this.isFetch = false;
+      this.loadedPosts = response;
+    });
+  }
+
+  onCreatePost(postData: Post) {
+    // Send Http request
+    this.postService.createPost(postData);
+  }
+
+  onFetchPosts() {
+    // Send Http request
+    this.isFetch = true;
+    this.postService.fetchPosts().subscribe((response) => {
+      this.isFetch = false;
+      this.loadedPosts = response;
+    });
+  }
+
+  onClearPosts() {
+    // Send Http request
+  }
+
+  ngOnDestroy(): void {
+    this.errorSub.unsubscribe();
+  }
+
 }

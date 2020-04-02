@@ -1,25 +1,67 @@
 <div class="container">
   <div class="row">
-    <div class="col-xs-12 col-sm-10 col-md-8 col-sm-offset-1 col-md-offset-2">
-      <input type="text" [(ngModel)]="filerStatus">
-      <hr>
-      <br><br>
-      <h2>App Status: {{ appStatus | async }}</h2>
-      <ul class="list-group">
-        <li
-          *ngFor="let server of servers | filter:filerStatus:'status'"
-          [ngClass]="getStatusClasses(server)"
-          class="list-group-item">
-          <span
-            class="badge">
-            {{ server.status }}
-          </span>
-          <strong>
-            {{ server.name | shorten:5 }}</strong> |
-            {{ server.instanceType | uppercase }} |
-            {{ server.started | date:'fullDate'}}
+    <div class="col-xs-12 col-md-6 col-md-offset-3">
+      <form #postForm="ngForm" (ngSubmit)="onCreatePost(postForm.value)">
+        <div class="form-group">
+          <label for="title">Title</label>
+          <input
+            class="form-control"
+            id="title"
+            name="title"
+            ngModel
+            required
+            type="text"
+          />
+        </div>
+        <div class="form-group">
+          <label for="content">Content</label>
+          <textarea
+            class="form-control"
+            id="content"
+            name="content"
+            ngModel
+            required
+          ></textarea>
+        </div>
+        <button
+          [disabled]="!postForm.valid"
+          class="btn btn-primary"
+          type="submit"
+        >
+          Send Post
+        </button>
+      </form>
+    </div>
+  </div>
+  <hr/>
+  <div class="row">
+    <div class="col-xs-12 col-md-6 col-md-offset-3">
+      <button (click)="onFetchPosts()" class="btn btn-primary">
+        Fetch Posts
+      </button>
+      |
+      <button
+        (click)="onClearPosts()"
+        [disabled]="loadedPosts.length < 1"
+        class="btn btn-danger"
+      >
+        Clear Posts
+      </button>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xs-12 col-md-6 col-md-offset-3">
+      <p *ngIf="!loadedPosts.length && !isFetch">No posts available!</p>
+      <ul *ngIf="loadedPosts && !isFetch" class="list-group">
+        <li *ngFor="let post of loadedPosts" class="list-group-item">
+          <h3> {{ post.title  }} </h3>
+          <p> {{ post.content }} </p>
         </li>
       </ul>
+      <p *ngIf="isFetch">Loading...</p>
+      <div class="alert alert-danger" *ngIf="errorMessage">
+        <h3>{{ errorMessage }}</h3>
+      </div>
     </div>
   </div>
 </div>
