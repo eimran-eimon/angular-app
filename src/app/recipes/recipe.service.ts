@@ -1,37 +1,61 @@
-import {Recipe} from './recipe.model';
-import {EventEmitter, Injectable} from '@angular/core';
-import {Ingredient} from '../shared/ingredient.model';
-import {ShoppingListService} from '../shopping-list/shoppingListService';
+import { Injectable } from '@angular/core';
+import { Subject } from 'rxjs';
+
+import { Recipe } from './recipe.model';
+import { Ingredient } from '../shared/ingredient.model';
+import { ShoppingListService } from '../shopping-list/shopping-list.service';
 
 @Injectable()
 export class RecipeService {
-  recipeDetailsEvent = new EventEmitter<Recipe>();
-  constructor(private shoppingListService: ShoppingListService) {}
+  recipesChanged = new Subject<Recipe[]>();
 
-  private recipes: Recipe[] = [
-    new Recipe(
-      'Air-Fryer Salmon with Maple-Dijon',
-      'Being landlocked in the Midwest, my kids always thought they disliked fish. This air-fryer salmon definitely changed their minds!',
-      'https://www.tasteofhome.com/wp-content/uploads/2020/03/Air-Fryer-Maple-Dijon-Salmon_EXPS_FT20_250682_F_0219_1-696x696.jpg',
-      [
-        new Ingredient('tablespoons butter', 3),
-        new Ingredient('salmon fillets (4 ounces each)', 4)
-      ]),
+  // private recipes: Recipe[] = [
+  //   new Recipe(
+  //     'Tasty Schnitzel',
+  //     'A super-tasty Schnitzel - just awesome!',
+  //     'https://upload.wikimedia.org/wikipedia/commons/7/72/Schnitzel.JPG',
+  //     [new Ingredient('Meat', 1), new Ingredient('French Fries', 20)]
+  //   ),
+  //   new Recipe(
+  //     'Big Fat Burger',
+  //     'What else you need to say?',
+  //     'https://upload.wikimedia.org/wikipedia/commons/b/be/Burger_King_Angus_Bacon_%26_Cheese_Steak_Burger.jpg',
+  //     [new Ingredient('Buns', 2), new Ingredient('Meat', 1)]
+  //   )
+  // ];
+  private recipes: Recipe[] = [];
 
-    new Recipe('Air-Fryer Red Potatoes',
-      'Roasting is one of my favorite ways to prepare veggies. Some fragrant rosemary, fresh or dried, gives these air-fryer red potatoes a distinctive but subtle taste.',
-      'https://www.tasteofhome.com/wp-content/uploads/2020/03/EXPS_H13x9BKZ16_4221__D05_06_3b_basedon-696x696.jpg',
-      [
-        new Ingredient('pounds small unpeeled red potatoes, cut into wedges', 2),
-        new Ingredient('garlic cloves, minced', 4)
-      ])
-  ];
+  constructor(private slService: ShoppingListService) {}
+
+  setRecipes(recipes: Recipe[]) {
+    this.recipes = recipes;
+    this.recipesChanged.next(this.recipes.slice());
+  }
 
   getRecipes() {
     return this.recipes.slice();
   }
 
-  addIngredients(ingredients: Ingredient[]){
-    this.shoppingListService.addListOfIngredients(ingredients);
+  getRecipe(index: number) {
+    return this.recipes[index];
+  }
+
+  addIngredientsToShoppingList(ingredients: Ingredient[]) {
+    this.slService.addIngredients(ingredients);
+  }
+
+  addRecipe(recipe: Recipe) {
+    this.recipes.push(recipe);
+    this.recipesChanged.next(this.recipes.slice());
+  }
+
+  updateRecipe(index: number, newRecipe: Recipe) {
+    this.recipes[index] = newRecipe;
+    this.recipesChanged.next(this.recipes.slice());
+  }
+
+  deleteRecipe(index: number) {
+    this.recipes.splice(index, 1);
+    this.recipesChanged.next(this.recipes.slice());
   }
 }
